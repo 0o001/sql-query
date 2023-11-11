@@ -6,9 +6,12 @@ const sql = new Proxy({ queryMap: {} }, {
                 for (const [key, value] of Object.entries(target.queryMap)) {
                     queryString += key.replace(/([a-z])([A-Z])/g, '$1 $2').toUpperCase() + ' ';
 
-                    if (Object.prototype.toString.call(...value) === '[object Object]') {
-                        queryString += Object.entries(...value).map(([k, v]) => `${k}=${typeof v === 'string' ? `'${v}'` : v}`).join(',');
-                    } else {
+                    const getType = Object.prototype.toString.call(...value);
+                    if ( getType === '[object Object]') {
+                        queryString += '(' + Object.entries(...value).map(([k, v]) => `${k}=${typeof v === 'string' ? `'${v}'` : v}`).join(',') + ')';
+                    } else if(getType === '[object Array]') {
+                        queryString += '(' + Object.values(...value).join(',') + ')';
+                    }else {
                         queryString += value.join(',');
                     }
                     
