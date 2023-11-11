@@ -4,14 +4,19 @@ const sql = new Proxy({ queryMap: {} }, {
             return () => {
                 let queryString = '';
                 for (const [key, value] of Object.entries(target.queryMap)) {
-                    queryString += key.toUpperCase() + ' ';
+                    queryString += key.replace(/([a-z])([A-Z])/g, '$1 $2').toUpperCase() + ' ';
+
                     if (Object.prototype.toString.call(...value) === '[object Object]') {
                         queryString += Object.entries(...value).map(([k, v]) => `${k}=${typeof v === 'string' ? `'${v}'` : v}`).join(',');
                     } else {
                         queryString += value.join(',');
                     }
-                    queryString += ' ';
+                    
+                    if(value.length) {
+                        queryString += ' ';
+                    }
                 }
+
                 return queryString.trim();
             }
         }
